@@ -60,6 +60,7 @@ const db = firebase.database();
 <div class="loan-card" onclick="openForm('Business Loan')">Business Loan</div>
 <div class="loan-card" onclick="openForm('KCC Loan')">KCC Loan</div>
 <div class="loan-card" onclick="openForm('Tractor Loan')">Tractor Loan</div>
+<div class="loan-card" onclick="openOtherForm()">अन्य जानकारी और लोन के लिए संपर्क करें !</div>
 <hr>
 <h3>Verification Services</h3>
 <div class="loan-card" onclick="openService('cibilData','CIBIL Check')">CIBIL Check</div>
@@ -91,6 +92,7 @@ const db = firebase.database();
         <button onclick="fetchAdminData('rcData')">RC</button>
         <button onclick="fetchAdminData('bankData')">Bank</button>
         <button onclick="fetchAdminData('otherData')">Others</button>
+        <button onclick="fetchAdminData('loan_or_anya_jankariyan')">Loan & Other Info</button>
     </div>
     <div id="admin-display-area">
         <p>Select a category to view data.</p>
@@ -104,6 +106,14 @@ const db = firebase.database();
 <input type="text" id="name" placeholder="Name" required>
 <input type="tel" id="mobile" placeholder="Mobile" required>
 <input type="number" id="age" placeholder="Age" required>
+<button type="submit">Submit</button>
+</form>
+</div>
+  <div id="other-section" class="hidden">
+<h3>अन्य जानकारी और लोन</h3>
+<form id="otherForm">
+<input type="text" id="oname" placeholder="Name" required>
+<input type="tel" id="omobile" placeholder="Mobile Number" required>
 <button type="submit">Submit</button>
 </form>
 </div>
@@ -173,6 +183,28 @@ function openService(key, titleTxt){
 function saveData(key, data){
     db.ref(key).push(data);
 }
+  function openOtherForm(){
+    showSection('other');
+}
+  function updateRow(key, id){
+    const cells = document.querySelectorAll(`[data-id='${id}']`);
+    let updatedData = {};
+
+    cells.forEach(cell => {
+        const field = cell.getAttribute("data-field");
+        updatedData[field] = cell.innerText;
+    });
+
+    db.ref(key + "/" + id).update(updatedData);
+    alert("Updated Successfully ✅");
+}
+  function deleteRow(key, id){
+    if(confirm("Are you sure to delete?")){
+        db.ref(key + "/" + id).remove();
+        alert("Deleted Successfully ❌");
+        fetchAdminData(key);
+    }
+}
 
 // Admin Login Logic
 function adminLogin() {
@@ -200,13 +232,20 @@ function fetchAdminData(key) {
         let tableHtml = `<table><thead><tr>`;
         const firstItem = Object.values(data)[0];
         const headers = Object.keys(firstItem);
-        
-        headers.forEach(h => tableHtml += `<th>${h.toUpperCase()}</th>`);
-        tableHtml += `</tr></thead><tbody>`;
 
-        Object.values(data).forEach(row => {
+        headers.forEach(h => tableHtml += `<th>${h.toUpperCase()}</th>`);
+        tableHtml += `<th>ACTIONS</th></tr></thead><tbody>`;
+
+        Object.entries(data).forEach(([id, row]) => {
             tableHtml += `<tr>`;
-            headers.forEach(h => tableHtml += `<td>${row[h]}</td>`);
+            headers.forEach(h => tableHtml += `<td contenteditable="true" data-id="${id}" data-key="${key}" data-field="${h}">${row[h]}</td>`);
+
+            tableHtml += `
+            <td>
+                <button onclick="updateRow('${key}','${id}')">Edit</button>
+                <button onclick="deleteRow('${key}','${id}')">Delete</button>
+            </td>`;
+            
             tableHtml += `</tr>`;
         });
 
@@ -226,6 +265,19 @@ loanForm.onsubmit = e => {
     saveData('loanApplications', data);
     alert("Submitted Successfully ✅");
     loanForm.reset();
+    showSection('home');
+};
+  const otherForm = document.getElementById("otherForm");
+
+otherForm.onsubmit = e => {
+    e.preventDefault();
+    const data = {
+        name: document.getElementById("oname").value,
+        mobile: document.getElementById("omobile").value
+    };
+    saveData('loan_or_anya_jankariyan', data);
+    alert("Submitted Successfully ✅");
+    otherForm.reset();
     showSection('home');
 };
 
