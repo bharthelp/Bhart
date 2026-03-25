@@ -60,14 +60,7 @@ const db = firebase.database();
 <div class="loan-card" onclick="openForm('Business Loan')">Business Loan</div>
 <div class="loan-card" onclick="openForm('KCC Loan')">KCC Loan</div>
 <div class="loan-card" onclick="openForm('Tractor Loan')">Tractor Loan</div>
-
-<!-- ✅ NEW OPTION -->
-<div class="loan-card" onclick="showSection('other-loan')">
-अन्य जानकारी और लोन के लिए संपर्क करें
-</div>
-
 <hr>
-
 <h3>Verification Services</h3>
 <div class="loan-card" onclick="openService('cibilData','CIBIL Check')">CIBIL Check</div>
 <div class="loan-card" onclick="openService('aadharData','Aadhar Verification')">Aadhar Verification</div>
@@ -75,47 +68,78 @@ const db = firebase.database();
 <div class="loan-card" onclick="openService('panData','PAN Verification')">PAN Verification</div>
 <div class="loan-card" onclick="openService('bankData','Bank Verification')">Bank Verification</div>
 <div class="loan-card" onclick="openService('otherData','Other Verification')">Other Verification</div>
-
 <hr>
-
 <button onclick="showSection('recharge')">Recharge</button>
 <button onclick="showSection('support')">Support</button>
 </div>
 
-<!-- बाकी सब original sections same -->
-
 <div id="login-section" class="hidden">
-<h3>Admin Login</h3>
-<input type="password" id="adminPass" placeholder="Enter Admin Password">
-<button onclick="adminLogin()">Login</button>
+    <h3>Admin Login</h3>
+    <input type="password" id="adminPass" placeholder="Enter Admin Password">
+    <button onclick="adminLogin()">Login</button>
 </div>
 
 <div id="admin-panel-section" class="hidden">
-<h3>Admin Dashboard</h3>
-<div class="admin-nav">
-<button onclick="fetchAdminData('loanApplications')">Loans</button>
-<button onclick="fetchAdminData('recharges')">Recharges</button>
-<button onclick="fetchAdminData('queries')">Queries</button>
-<button onclick="fetchAdminData('cibilData')">CIBIL</button>
-<button onclick="fetchAdminData('aadharData')">Aadhar</button>
-<button onclick="fetchAdminData('panData')">PAN</button>
-<button onclick="fetchAdminData('rcData')">RC</button>
-<button onclick="fetchAdminData('bankData')">Bank</button>
-<button onclick="fetchAdminData('otherData')">Others</button>
-
-<!-- ✅ NEW ADMIN TAB -->
-<button onclick="fetchAdminData('otherLoanEnquiry')">Other Loan Enquiry</button>
-
-</div>
-<div id="admin-display-area"></div>
+    <h3>Admin Dashboard</h3>
+    <div class="admin-nav">
+        <button onclick="fetchAdminData('loanApplications')">Loans</button>
+        <button onclick="fetchAdminData('recharges')">Recharges</button>
+        <button onclick="fetchAdminData('queries')">Queries</button>
+        <button onclick="fetchAdminData('cibilData')">CIBIL</button>
+        <button onclick="fetchAdminData('aadharData')">Aadhar</button>
+        <button onclick="fetchAdminData('panData')">PAN</button>
+        <button onclick="fetchAdminData('rcData')">RC</button>
+        <button onclick="fetchAdminData('bankData')">Bank</button>
+        <button onclick="fetchAdminData('otherData')">Others</button>
+    </div>
+    <div id="admin-display-area">
+        <p>Select a category to view data.</p>
+    </div>
 </div>
 
-<!-- ✅ NEW FORM -->
-<div id="other-loan-section" class="hidden">
-<h3>अन्य जानकारी के लिए संपर्क करें</h3>
-<form id="otherLoanForm">
-<input type="text" id="oname" placeholder="Name" required>
-<input type="tel" id="omobile" placeholder="Mobile Number" required>
+<div id="form-section" class="hidden">
+<h3 id="title"></h3>
+<form id="loanForm">
+<input type="hidden" id="loanType">
+<input type="text" id="name" placeholder="Name" required>
+<input type="tel" id="mobile" placeholder="Mobile" required>
+<input type="number" id="age" placeholder="Age" required>
+<button type="submit">Submit</button>
+</form>
+</div>
+
+<div id="service-section" class="hidden">
+<h3 id="serviceTitle"></h3>
+<form id="serviceForm">
+<input type="hidden" id="serviceKey">
+<input type="text" id="sname2" placeholder="Customer Name" required>
+<input type="tel" id="smobile2" placeholder="Mobile Number" required>
+<button type="submit">Submit</button>
+</form>
+</div>
+
+<div id="recharge-section" class="hidden">
+<h3>Recharge</h3>
+<form id="rechargeForm">
+<input type="text" id="rname" placeholder="Name" required>
+<input type="tel" id="rmobile" placeholder="Mobile" required>
+<select id="company">
+<option>Airtel</option>
+<option>Jio</option>
+<option>VI</option>
+<option>BSNL</option>
+</select>
+<input type="number" id="amount" placeholder="Amount" required>
+<button type="submit">Recharge</button>
+</form>
+</div>
+
+<div id="support-section" class="hidden">
+<h3>Support</h3>
+<form id="supportForm">
+<input type="text" id="sname" placeholder="Name" required>
+<input type="tel" id="smobile" placeholder="Mobile" required>
+<textarea id="query" placeholder="Query"></textarea>
 <button type="submit">Submit</button>
 </form>
 </div>
@@ -123,88 +147,127 @@ const db = firebase.database();
 </div>
 
 <script>
+const loanForm = document.getElementById("loanForm");
+const serviceForm = document.getElementById("serviceForm");
+const rechargeForm = document.getElementById("rechargeForm");
+const supportForm = document.getElementById("supportForm");
 
 function showSection(id){
-document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
-document.getElementById(id+'-section').classList.remove('hidden');
+    document.querySelectorAll('.container > div').forEach(d=>d.classList.add('hidden'));
+    const section = document.getElementById(id+'-section');
+    if(section) section.classList.remove('hidden');
 }
 
-function saveData(key,data){
-db.ref(key).push(data);
+function openForm(type){
+    showSection('form');
+    document.getElementById("title").innerText = type;
+    document.getElementById("loanType").value = type;
 }
 
-function adminLogin(){
-if(document.getElementById("adminPass").value==="admin123"){
-showSection('admin-panel');
-}else alert("Wrong Password");
+function openService(key, titleTxt){
+    showSection('service');
+    document.getElementById("serviceKey").value = key;
+    document.getElementById("serviceTitle").innerText = titleTxt;
 }
 
-/* ✅ UPDATED ADMIN FUNCTION */
-function fetchAdminData(key){
-const display=document.getElementById("admin-display-area");
-
-db.ref(key).once('value',(snap)=>{
-const data=snap.val();
-if(!data){display.innerHTML="No data";return;}
-
-let html="<table><tr>";
-const headers=Object.keys(Object.values(data)[0]);
-
-headers.forEach(h=>html+=`<th>${h}</th>`);
-html+="<th>Action</th></tr>";
-
-Object.entries(data).forEach(([id,row])=>{
-html+="<tr>";
-headers.forEach(h=>html+=`<td contenteditable data-id="${id}" data-key="${h}">${row[h]}</td>`);
-
-html+=`
-<td>
-<button onclick="updateRow('${key}','${id}')">Edit</button>
-<button onclick="deleteRow('${key}','${id}')">Delete</button>
-</td>`;
-
-html+="</tr>";
-});
-
-html+="</table>";
-display.innerHTML=html;
-});
+function saveData(key, data){
+    db.ref(key).push(data);
 }
 
-/* DELETE */
-function deleteRow(key,id){
-if(confirm("Delete?")){
-db.ref(key+'/'+id).remove();
-alert("Deleted");
-fetchAdminData(key);
-}
-}
-
-/* UPDATE */
-function updateRow(key,id){
-const cells=document.querySelectorAll(`[data-id='${id}']`);
-let data={};
-cells.forEach(c=>{
-data[c.dataset.key]=c.innerText;
-});
-db.ref(key+'/'+id).update(data);
-alert("Updated");
+// Admin Login Logic
+function adminLogin() {
+    const pass = document.getElementById("adminPass").value;
+    // Password set to 'admin123'
+    if(pass === "admin123") {
+        showSection('admin-panel');
+    } else {
+        alert("Incorrect Password!");
+    }
 }
 
-/* ✅ FORM SUBMIT */
-const otherLoanForm=document.getElementById("otherLoanForm");
+// Fetch and Show Data in Admin Panel
+function fetchAdminData(key) {
+    const displayArea = document.getElementById("admin-display-area");
+    displayArea.innerHTML = "<p>Loading...</p>";
 
-otherLoanForm.onsubmit=e=>{
-e.preventDefault();
-saveData('otherLoanEnquiry',{
-name:oname.value,
-mobile:omobile.value
-});
-alert("Submitted Successfully ✅");
-otherLoanForm.reset();
-showSection('home');
+    db.ref(key).once('value', (snapshot) => {
+        const data = snapshot.val();
+        if(!data) {
+            displayArea.innerHTML = "<p>No data found.</p>";
+            return;
+        }
+
+        let tableHtml = `<table><thead><tr>`;
+        const firstItem = Object.values(data)[0];
+        const headers = Object.keys(firstItem);
+        
+        headers.forEach(h => tableHtml += `<th>${h.toUpperCase()}</th>`);
+        tableHtml += `</tr></thead><tbody>`;
+
+        Object.values(data).forEach(row => {
+            tableHtml += `<tr>`;
+            headers.forEach(h => tableHtml += `<td>${row[h]}</td>`);
+            tableHtml += `</tr>`;
+        });
+
+        tableHtml += `</tbody></table>`;
+        displayArea.innerHTML = `<h4>Displaying: ${key}</h4>` + tableHtml;
+    });
+}
+
+loanForm.onsubmit = e => {
+    e.preventDefault();
+    const data = {
+        type: document.getElementById("loanType").value,
+        name: document.getElementById("name").value,
+        mobile: document.getElementById("mobile").value,
+        age: document.getElementById("age").value
+    };
+    saveData('loanApplications', data);
+    alert("Submitted Successfully ✅");
+    loanForm.reset();
+    showSection('home');
 };
 
+serviceForm.onsubmit = e => {
+    e.preventDefault();
+    const key = document.getElementById("serviceKey").value;
+    const data = {
+        name: document.getElementById("sname2").value,
+        mobile: document.getElementById("smobile2").value
+    };
+    saveData(key, data);
+    alert("Submitted Successfully ✅");
+    serviceForm.reset();
+    showSection('home');
+};
+
+rechargeForm.onsubmit = e => {
+    e.preventDefault();
+    const data = {
+        name: document.getElementById("rname").value,
+        mobile: document.getElementById("rmobile").value,
+        company: document.getElementById("company").value,
+        amount: document.getElementById("amount").value
+    };
+    saveData('recharges', data);
+    alert("Submitted Successfully ✅");
+    rechargeForm.reset();
+    showSection('home');
+};
+
+supportForm.onsubmit = e => {
+    e.preventDefault();
+    const data = {
+        name: document.getElementById("sname").value,
+        mobile: document.getElementById("smobile").value,
+        query: document.getElementById("query").value
+    };
+    saveData('queries', data);
+    alert("Submitted Successfully ✅");
+    supportForm.reset();
+    showSection('home');
+};
 </script>
 
 </body>
