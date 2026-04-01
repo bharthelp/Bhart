@@ -14,6 +14,38 @@ header { background:#003366; color:white; text-align:center; padding:15px; posit
 .hidden { display:none !important; }
 .loan-card { border:2px solid #003366; padding:15px; margin:10px; cursor:pointer; text-align:center; }
 .loan-card:hover { background:#003366; color:white; }
+    /* JOB SPECIAL BUTTON - STYLISH & BIG */
+.job-btn {
+    background: linear-gradient(45deg, #ff512f, #dd2476);
+    color: white;
+    padding: 20px;
+    margin: 15px 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+    transition: 0.4s;
+    border: 2px solid white;
+}
+.job-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(221, 36, 118, 0.6);
+    background: linear-gradient(45deg, #dd2476, #ff512f);
+}
+
+input, textarea, select { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:1px solid #ccc; box-sizing: border-box; }
+button { margin:8px 5px; padding:10px 15px; background: linear-gradient(90deg, #003366, #0059b3); color:white; border:none; border-radius:8px; cursor:pointer; transition:0.3s; }
+button:hover { transform:scale(1.05); }
+
+table { width:100%; border-collapse:collapse; margin-top: 20px; border-radius:10px; overflow:hidden; }
+td, th { border:1px solid #ddd; padding:10px; text-align: left; }
+th { background:#003366; color:white; }
+tr:nth-child(even) { background:#f9f9f9; }
+
+.admin-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+
 input, textarea, select { width:100%; padding:10px; margin-top:10px; box-sizing: border-box; }
 button { margin:5px; padding:8px; background:#003366; color:white; border:none; cursor:pointer; }
 table { width:100%; border-collapse:collapse; margin-top: 20px; }
@@ -226,13 +258,8 @@ const db = firebase.database();
 <div class="home-btn" onclick="showSection('home')">Home</div>
 <h2>Kirath.cs</h2>
 </header>
-   <div class="notice-bar">
-  <p>📢 महत्वपूर्ण सूचना:  सरकारी और निजी, दोनों नौकरियों के लिए | <a href="https://www.ncs.gov.in/">यहाँ क्लिक करें</a></p>
-</div>
-<div class="notice-bar">
-  <p>📢 : RTI (सूचना का अधिकार) ऑनलाइन | <a href="https://rtionline.gov.in/">यहाँ क्लिक करें</a></p>
-</div>
-  
+
+
 <div class="notice-board">
   <span class="close-btn" onclick="this.parentElement.style.display='none'">✖</span>
     <h3>📢 सूचना</h3>
@@ -252,7 +279,15 @@ const db = firebase.database();
 
 <div id="home-section">
   
-<h3>Select Loan</h3>
+<h3>Select Services</h3>
+      <div class="notice-bar">
+  <p>📢 महत्वपूर्ण सूचना:  सरकारी और निजी, दोनों नौकरियों के लिए | <a href="https://www.ncs.gov.in/">यहाँ क्लिक करें</a></p>
+</div>
+<div class="notice-bar">
+  <p>📢 : RTI (सूचना का अधिकार) ऑनलाइन | <a href="https://rtionline.gov.in/">यहाँ क्लिक करें</a></p>
+</div>
+    
+<div class="job-btn" onclick="showSection('job')">🚀 नौकरी संबंधी सूचनाएं और पंजीकरण के लिए आवेदन करें</div>
 <div class="loan-card" onclick="openForm('Home Loan')">Home Loan</div>
 <div class="loan-card" onclick="openForm('Personal Loan')">Personal Loan</div>
 <div class="loan-card" onclick="openForm('Business Loan')">Business Loan</div>
@@ -272,6 +307,15 @@ const db = firebase.database();
 <button onclick="showSection('support')">Support</button>
 </div>
 
+<div id="job-section" class="hidden">
+    <h3>नौकरी पंजीकरण फॉर्म</h3>
+    <form id="jobForm">
+        <input type="text" id="studentName" placeholder="Student Name" required>
+        <input type="tel" id="studentMobile" placeholder="Mobile Number" required>
+        <button type="submit">Submit Application</button>
+    </form>
+</div>
+
 <div id="login-section" class="hidden">
     <h3>Admin Login</h3>
     <input type="password" id="adminPass" placeholder="Enter Admin Password">
@@ -281,6 +325,7 @@ const db = firebase.database();
 <div id="admin-panel-section" class="hidden">
     <h3>Admin Dashboard</h3>
     <div class="admin-nav">
+        <button style="background: #dd2476;" onclick="fetchAdminData('student_applications')">Student Apps 🎓</button>
         <button onclick="fetchAdminData('loanApplications')">Loans</button>
         <button onclick="fetchAdminData('recharges')">Recharges</button>
         <button onclick="fetchAdminData('queries')">Queries</button>
@@ -408,7 +453,7 @@ function saveData(key, data){
 function adminLogin() {
     const pass = document.getElementById("adminPass").value;
     // Password set to 'admin123'
-    if(pass === "admin123") {
+    if(pass === "Bharat@1997") {
         showSection('admin-panel');
     } else {
         alert("Incorrect Password!");
@@ -451,6 +496,19 @@ function fetchAdminData(key) {
         displayArea.innerHTML = `<h4>Displaying: ${key}</h4>` + tableHtml;
     });
 }
+// JOB FORM SUBMIT
+jobForm.onsubmit = e => {
+    e.preventDefault();
+    const data = {
+        studentName: document.getElementById("studentName").value,
+        mobileNumber: document.getElementById("studentMobile").value,
+        timestamp: new Date().toLocaleString()
+    };
+    saveData('student_applications', data);
+    alert("Submitted Successfully ✅");
+    jobForm.reset();
+    showSection('home');
+};
 
 loanForm.onsubmit = e => {
     e.preventDefault();
