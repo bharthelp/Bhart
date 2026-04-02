@@ -52,6 +52,76 @@ table { width:100%; border-collapse:collapse; margin-top: 20px; }
 td, th { border:1px solid #ccc; padding:8px; text-align: left; }
 th { background:#003366; color:white; }
 .admin-nav { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+    /* Latest Jobs Sidebar Box */
+.job-sidebar {
+    width: 250px;
+    background: white;
+    border: 2px solid #003366;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 20px;
+    margin-right: 20px;
+}
+
+.job-sidebar h3 {
+    background: #003366;
+    color: white;
+    margin: -15px -15px 15px -15px;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.job-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.job-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.job-item:last-child {
+    border-bottom: none;
+}
+
+.job-item a {
+    text-decoration: none;
+    color: #dd2476;
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    transition: 0.3s;
+}
+
+.job-item a:hover {
+    color: #003366;
+    transform: translateX(5px);
+}
+
+.job-item span {
+    font-size: 11px;
+    color: #666;
+    display: block;
+}
+
+/* Layout Adjustment */
+.main-wrapper {
+    display: flex;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+@media (max-width: 768px) {
+    .main-wrapper { flex-direction: column; }
+    .job-sidebar { width: 100%; margin-bottom: 20px; position: static; }
+}
 </style>
   <style>
 body {
@@ -275,6 +345,31 @@ const db = firebase.database();
 
     <p>हमारी टीम आपसे संपर्क करके समस्या का समाधान करेगी।</p>
 </div>
+     <div class="main-wrapper">
+    <div class="job-sidebar">
+        <h3>🆕 Latest Jobs</h3>
+        <div class="job-list">
+            
+            <div class="job-item">
+                <a href="https://upsssc.gov.in//AllNotifications.aspx" target="_blank">UP subordinate SSC EXM 02 </a>
+                <span>Start 02 Apr अंतिम तिथि: 22 अप्रैल</span>
+            </div>
+
+            <div class="job-item">
+                <a href="https://www.joinindiannavy.gov.in/en/account/account/state" target="_blank">Indian Navy Agni veer MR Class 10th </a>
+                <span>Musician start 11 apr or end 26 apr 2026</span>
+            </div>
+
+            <div class="job-item">
+                <a href="https://recruitment.itbpolice.nic.in/rect/index.php" target="_blank">ITBP Constable Exam 2026 </a>
+                <span>start 30 March or End 28 April 2026</span>
+            </div>
+
+            <div class="job-item">
+                <a href="https://applyssb.com/SSB_ADVT_2_SI/applicationIndex{" target="_blank">SSB Head constable SI ASI </a>
+                <span> Running End 20 April 2026</span>
+            </div>
+            
 <div class="container">
 
 <div id="home-section">
